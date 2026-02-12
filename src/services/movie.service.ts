@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, forkJoin, throwError } from 'rxjs';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { environment } from '../environments/environment';
@@ -105,6 +105,14 @@ export class MovieService {
   private readonly notificationService = inject(NotificationService);
   private readonly apiUrl = `${API_BASE_URL}/api/movies`;
 
+  // Create a helper method to generate the headers
+  private getHeaders() {
+    return new HttpHeaders({
+      'ngrok-skip-browser-warning': 'true',
+      'Content-Type': 'application/json'
+    });
+  }
+
   // -------------------------------------------------------------------------
   // State Management with Signals
   // -------------------------------------------------------------------------
@@ -172,7 +180,7 @@ export class MovieService {
     this._isLoading.set(true);
     this._error.set(null);
 
-    return this.http.get<MovieSummary[]>(`${this.apiUrl}/trending`).pipe(
+    return this.http.get<MovieSummary[]>(`${this.apiUrl}/trending`, { headers: this.getHeaders() }).pipe(
       tap((movies) => this._trendingMovies.set(movies)),
       catchError((error) => {
         this._error.set('Failed to fetch trending movies');
@@ -191,7 +199,7 @@ export class MovieService {
     this._isLoading.set(true);
     this._error.set(null);
 
-    return this.http.get<MovieSummary[]>(`${this.apiUrl}/popular`).pipe(
+    return this.http.get<MovieSummary[]>(`${this.apiUrl}/popular`, { headers: this.getHeaders() }).pipe(
       tap((movies) => this._popularMovies.set(movies)),
       catchError((error) => {
         this._error.set('Failed to fetch popular movies');
@@ -208,6 +216,7 @@ export class MovieService {
    */
   fetchRandomMovies(count: number = 10): Observable<MovieSummary[]> {
     return this.http.get<MovieSummary[]>(`${this.apiUrl}/random`, {
+      headers: this.getHeaders(),
       params: { count: count.toString() }
     }).pipe(
       tap((movies) => this._randomMovies.set(movies)),
@@ -226,8 +235,8 @@ export class MovieService {
     this._error.set(null);
 
     return forkJoin([
-      this.http.get<MovieSummary[]>(`${this.apiUrl}/trending`),
-      this.http.get<MovieSummary[]>(`${this.apiUrl}/popular`)
+      this.http.get<MovieSummary[]>(`${this.apiUrl}/trending`, { headers: this.getHeaders() }),
+      this.http.get<MovieSummary[]>(`${this.apiUrl}/popular`, { headers: this.getHeaders() })
     ]).pipe(
       tap(([trending, popular]) => {
         this._trendingMovies.set(trending);
@@ -256,6 +265,7 @@ export class MovieService {
     this._error.set(null);
 
     return this.http.get<MovieSummary[]>(`${this.apiUrl}/search`, {
+      headers: this.getHeaders(),
       params: { title }
     }).pipe(
       tap((movies) => this._searchResults.set(movies)),
@@ -275,7 +285,7 @@ export class MovieService {
     this._isLoading.set(true);
     this._error.set(null);
 
-    return this.http.get<MovieDetails>(`${this.apiUrl}/${tmdbId}`).pipe(
+    return this.http.get<MovieDetails>(`${this.apiUrl}/${tmdbId}`, { headers: this.getHeaders() }).pipe(
       tap((movie) => this._selectedMovie.set(movie)),
       catchError((error) => {
         this._error.set('Failed to fetch movie details');
@@ -291,7 +301,7 @@ export class MovieService {
    * Get similar movies by TMDB ID
    */
   getSimilarMovies(tmdbId: number): Observable<MovieSummary[]> {
-    return this.http.get<MovieSummary[]>(`${this.apiUrl}/${tmdbId}/similar`).pipe(
+    return this.http.get<MovieSummary[]>(`${this.apiUrl}/${tmdbId}/similar`, { headers: this.getHeaders() }).pipe(
       tap((movies) => this._similarMovies.set(movies)),
       catchError((error) => {
         console.error('Failed to fetch similar movies:', error);
@@ -307,8 +317,8 @@ export class MovieService {
     this._isLoading.set(true);
 
     return forkJoin({
-      movie: this.http.get<MovieDetails>(`${this.apiUrl}/${tmdbId}`),
-      similar: this.http.get<MovieSummary[]>(`${this.apiUrl}/${tmdbId}/similar`).pipe(
+      movie: this.http.get<MovieDetails>(`${this.apiUrl}/${tmdbId}`, { headers: this.getHeaders() }),
+      similar: this.http.get<MovieSummary[]>(`${this.apiUrl}/${tmdbId}/similar`, { headers: this.getHeaders() }).pipe(
         catchError(() => of([]))
       )
     }).pipe(

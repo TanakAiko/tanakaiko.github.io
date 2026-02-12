@@ -70,6 +70,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
+  // Inject ngrok bypass header into ALL requests
+  authReq = authReq.clone({
+    setHeaders: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  });
+
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // Don't attempt token refresh for auth endpoints (login, register, refresh)
