@@ -1,0 +1,350 @@
+<!-- Loading State -->
+@if (isLoading()) {
+  <div class="min-h-full flex items-center justify-center bg-[#1a1f26]">
+    <div class="text-center">
+      <div class="w-16 h-16 border-4 border-[#00a8c5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-gray-400">Loading movie details...</p>
+    </div>
+  </div>
+}
+
+@if (movie(); as m) {
+  <div class="min-h-full pb-20 bg-[#1a1f26] relative">
+    
+    <!-- Top Navigation Bar -->
+    <div class="absolute top-0 left-0 right-0 z-40 p-6 flex justify-between items-center bg-gradient-to-b from-[#1a1f26]/90 to-transparent">
+      <!-- Back Button -->
+      <button (click)="goBack()" class="flex items-center gap-2 text-white/80 hover:text-white transition-colors group flex-shrink-0 cursor-pointer bg-transparent border-none">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 group-hover:-translate-x-1 transition-transform">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+        <span class="font-semibold">Back</span>
+      </button>
+
+      <!-- Search Bar -->
+      <div class="glass-panel rounded-full px-4 h-11 flex items-center w-full max-w-xs md:max-w-md mx-4 transition-all duration-300 hover:scale-105 focus-within:scale-105 hover:shadow-[0_0_15px_rgba(0,168,197,0.4)] hover:border-[#00a8c5]/50 group">
+        <input #searchInput type="text" placeholder="Search for Movie" 
+               class="bg-transparent border-none outline-none text-sm text-white w-full px-2 placeholder-gray-400 h-full"
+               (keydown.enter)="navigateToSearch(searchInput.value)">
+        <button (click)="navigateToSearch(searchInput.value)" class="p-2 text-white/80 group-hover:text-[#00a8c5] transition-colors flex items-center justify-center cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Login / User Menu -->
+      <div class="flex items-center gap-4 flex-shrink-0">
+        @if (!authService.isLoggedIn()) {
+          <a routerLink="/auth" class="bg-[#00a8c5] hover:bg-[#0097b2] text-white px-6 h-11 rounded-full font-bold shadow-lg shadow-[#00a8c5]/20 transition-all flex items-center gap-2 whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+              <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+            </svg>
+            Login
+          </a>
+        } @else {
+          <div class="relative group">
+            <button class="w-11 h-11 rounded-full bg-gradient-to-tr from-[#00a8c5] to-cyan-600 flex items-center justify-center text-white font-bold shadow-lg ring-2 ring-white/10 hover:ring-[#00a8c5] transition-all">
+               <span class="text-lg">{{ authService.currentUser()?.username?.charAt(0)?.toUpperCase() }}</span>
+            </button>
+            <div class="absolute right-0 mt-2 w-48 bg-[#252b36] rounded-xl shadow-xl border border-white/5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
+              <div class="px-4 py-3 border-b border-white/5">
+                <p class="text-sm text-white font-bold truncate">{{ authService.currentUser()?.username }}</p>
+                <a routerLink="/profile" class="text-xs text-[#00a8c5] hover:underline cursor-pointer block mt-1">View Profile</a>
+              </div>
+              <button (click)="authService.logout()" class="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-white/5 transition-colors rounded-b-xl">
+                Sign out
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Header Image with Content -->
+    <div class="relative w-full h-[60vh]">
+      <div class="absolute inset-0 bg-black">
+         <img [src]="m.backdrop" class="w-full h-full object-cover opacity-50" alt="Backdrop">
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-t from-[#1a1f26] via-[#1a1f26]/60 to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-[#1a1f26] via-transparent to-transparent"></div>
+
+      <div class="absolute bottom-0 left-0 w-full p-8 lg:p-12 flex flex-col lg:flex-row items-end gap-8 z-10">
+        <!-- Poster (Overlapping) -->
+        <div class="hidden lg:block w-64 h-96 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/10 flex-shrink-0 relative z-10 bg-[#1a1f26]">
+          <img [src]="m.poster" class="object-cover w-full h-full" alt="Poster">
+        </div>
+
+        <div class="flex-1 mb-4 z-10">
+          <h1 class="text-5xl lg:text-6xl font-black text-white uppercase tracking-tight mb-2 drop-shadow-lg">{{m.title}}</h1>
+          <div class="flex items-center gap-4 text-gray-300 text-sm md:text-base font-medium mb-6">
+            <span>{{m.year}}</span>
+            <span class="w-1.5 h-1.5 bg-[#00a8c5] rounded-full"></span>
+            <span>{{m.genres.join(', ')}}</span>
+            <span class="w-1.5 h-1.5 bg-[#00a8c5] rounded-full"></span>
+            <span>{{m.duration}}</span>
+          </div>
+          
+          <p class="max-w-2xl text-gray-200 text-lg leading-relaxed mb-6 drop-shadow-md">
+            {{m.description}}
+          </p>
+
+          <!-- Actions Row -->
+           <div class="flex flex-wrap gap-4">
+              @if (authService.isLoggedIn()) {
+                <!-- Watchlist Button -->
+                <button (click)="toggleWatchlist()" 
+                        class="bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold py-3 px-6 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2">
+                   @if (inWatchlist()) {
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-[#00a8c5]">
+                         <path fill-rule="evenodd" d="M6.32 2.577a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 01-1.085.67L12 18.089l-7.165 3.583A.75.75 0 013.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93z" clip-rule="evenodd" />
+                      </svg>
+                      Added to Watchlist
+                   } @else {
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      </svg>
+                      Add to Watchlist
+                   }
+                </button>
+
+                <!-- Recommend Button -->
+                <button (click)="openRecommendModal()" 
+                        class="bg-[#00a8c5] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#0097b2] transition-all flex items-center gap-2 shadow-lg shadow-[#00a8c5]/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                  </svg>
+                  Recommend to Friend
+                </button>
+              }
+           </div>
+        </div>
+
+        <!-- Rating Box (Interactive) -->
+        <div class="glass-panel p-6 rounded-2xl mb-4 w-full lg:w-96 flex-shrink-0 border border-white/5 shadow-xl transition-all duration-300">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Rate & Review</h3>
+          
+          @if (authService.isLoggedIn()) {
+            <!-- Star Interaction -->
+            <div class="flex items-center gap-2 mb-4">
+              @for (star of [1,2,3,4,5]; track star) {
+                 <button (click)="setRating(star)" class="focus:outline-none transition-transform active:scale-95 hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
+                         [attr.fill]="star <= currentRating() ? 'currentColor' : 'none'"
+                         [class.text-[#00a8c5]]="star <= currentRating()"
+                         [class.text-gray-600]="star > currentRating()"
+                         stroke="currentColor" stroke-width="2"
+                         class="w-8 h-8 transition-colors duration-200">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.563.04.8.77.388 1.192l-4.204 4.312a.563.563 0 00-.154.488l1.284 5.757a.562.562 0 01-.84.613l-4.726-2.853a.563.563 0 00-.586 0l-4.726 2.853a.562.562 0 01-.84-.613l1.285-5.757a.563.563 0 00-.154-.488l-4.204-4.312a.563.563 0 01.388-1.192l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                    </svg>
+                 </button>
+              }
+            </div>
+
+            <!-- Comment Input -->
+            <div class="mb-4">
+              <textarea 
+                [(ngModel)]="reviewComment" 
+                placeholder="Share your thoughts about this movie..." 
+                rows="3"
+                class="w-full bg-black/20 text-white text-sm rounded-lg p-3 border border-white/10 focus:border-[#00a8c5] outline-none resize-none transition-colors placeholder-gray-500"
+              ></textarea>
+            </div>
+
+            <div class="flex justify-between items-center">
+               <div class="text-2xl font-bold text-white">{{m.rating}}/5.0</div>
+               <button (click)="submitReview()" 
+                       [disabled]="currentRating() === 0 || isSubmittingReview()"
+                       class="bg-[#eeeeee] text-[#1a1f26] font-bold py-2 px-6 rounded-lg hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                 @if (isSubmittingReview()) {
+                   Submitting...
+                 } @else {
+                   Submit
+                 }
+               </button>
+            </div>
+          } @else {
+            <p class="text-gray-400 text-sm mb-4">Sign in to rate this movie</p>
+            <div class="flex justify-between items-center">
+               <div class="text-2xl font-bold text-white">{{m.rating}}/5.0</div>
+               <a routerLink="/auth" class="bg-[#00a8c5] text-white font-bold py-2 px-6 rounded-lg hover:bg-[#0097b2] transition-all">
+                 Sign In
+               </a>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="p-8 lg:p-12 grid lg:grid-cols-3 gap-12">
+      
+      <!-- Left Column -->
+      <div class="lg:col-span-2 space-y-12">
+        
+        <!-- Cast & Crew Section -->
+        <section>
+           <h2 class="text-xl font-bold uppercase tracking-wider text-gray-400 mb-6 border-b border-white/5 pb-2">Cast & Crew</h2>
+           <div class="flex gap-8 overflow-x-auto pb-4 no-scrollbar items-start">
+              
+              <!-- Directors -->
+              @for (director of m.directors; track director.tmdbId) {
+                <div class="flex flex-col items-center min-w-[120px] group">
+                  <div class="relative w-28 h-28 rounded-full overflow-hidden border-2 border-[#00a8c5] shadow-[0_0_15px_rgba(0,168,197,0.3)] mb-3 transition-transform group-hover:scale-105">
+                     <img [src]="director.profileImage" class="object-cover w-full h-full" [alt]="director.name">
+                  </div>
+                  <span class="text-white font-bold text-sm text-center leading-tight group-hover:text-[#00a8c5] transition-colors">{{director.name}}</span>
+                  <span class="text-[#00a8c5] text-[10px] font-bold uppercase tracking-widest mt-1">Director</span>
+                </div>
+              }
+
+              <!-- Cast Members -->
+              @for (actor of m.cast; track actor.tmdbId) {
+                 <div class="flex flex-col items-center min-w-[100px] group">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-white/10 shadow-lg mb-3 hover:border-white/30 transition-all group-hover:scale-105">
+                       <img [src]="actor.profileImage" class="object-cover w-full h-full grayscale-[30%] group-hover:grayscale-0 transition-all" [alt]="actor.name">
+                    </div>
+                    <span class="text-gray-200 font-medium text-sm text-center leading-tight group-hover:text-white transition-colors">{{actor.name}}</span>
+                    <span class="text-gray-500 text-xs mt-1">Actor</span>
+                 </div>
+              }
+           </div>
+        </section>
+
+        <!-- Movie Info Section (replacing reviews since backend doesn't have reviews per movie) -->
+        <section>
+          <div class="flex items-center justify-between mb-6 border-b border-white/5 pb-2">
+             <h2 class="text-xl font-bold uppercase tracking-wider text-gray-400">Movie Info</h2>
+          </div>
+          
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-[#252b36] p-6 rounded-2xl">
+              <h3 class="text-gray-400 text-xs uppercase tracking-wider mb-2">Release Year</h3>
+              <p class="text-white text-xl font-bold">{{m.year}}</p>
+            </div>
+            <div class="bg-[#252b36] p-6 rounded-2xl">
+              <h3 class="text-gray-400 text-xs uppercase tracking-wider mb-2">Runtime</h3>
+              <p class="text-white text-xl font-bold">{{m.duration}}</p>
+            </div>
+            <div class="bg-[#252b36] p-6 rounded-2xl">
+              <h3 class="text-gray-400 text-xs uppercase tracking-wider mb-2">Genres</h3>
+              <div class="flex flex-wrap gap-2">
+                @for (genre of m.genres; track genre) {
+                  <span class="bg-[#00a8c5]/20 text-[#00a8c5] text-xs px-3 py-1 rounded-full font-medium">{{genre}}</span>
+                }
+              </div>
+            </div>
+            <div class="bg-[#252b36] p-6 rounded-2xl">
+              <h3 class="text-gray-400 text-xs uppercase tracking-wider mb-2">Rating</h3>
+              <div class="flex items-center gap-2">
+                <span class="text-[#00a8c5] text-2xl font-bold">{{m.rating}}</span>
+                <span class="text-gray-400">/5.0</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column: Similar Movies -->
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold uppercase tracking-wider text-gray-400 mb-4 border-b border-white/5 pb-2">Similar Movies</h2>
+        @if (similarMovies().length > 0) {
+          <div class="grid grid-cols-2 gap-4">
+             @for (similar of similarMovies().slice(0, 4); track similar.tmdbId) {
+               <a [routerLink]="['/movie', similar.tmdbId]" class="block group relative aspect-[2/3] rounded-xl overflow-hidden cursor-pointer shadow-lg border border-white/5">
+                  <img [src]="getSimilarPosterUrl(similar)" class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500" alt="Similar">
+                  <div class="absolute inset-0 bg-[#1a1f26]/40 group-hover:bg-[#1a1f26]/0 transition-colors"></div>
+                  <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-[#1a1f26] via-[#1a1f26]/80 to-transparent">
+                    <p class="text-xs text-center font-bold text-white truncate group-hover:text-[#00a8c5] transition-colors">{{similar.title}}</p>
+                  </div>
+               </a>
+             }
+          </div>
+        } @else {
+          <div class="text-center py-8 bg-[#252b36]/50 rounded-2xl border border-white/5">
+            <p class="text-gray-400">No similar movies found</p>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- Recommend Modal -->
+@if (showRecommendModal()) {
+   <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div (click)="closeRecommendModal()" class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"></div>
+      
+      <!-- Modal Content -->
+      <div class="relative bg-[#1a1f26] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl p-6 transform transition-all scale-100 max-h-[90vh] overflow-y-auto">
+         <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-white">Recommend to Friend</h3>
+            <button (click)="closeRecommendModal()" class="text-gray-400 hover:text-white transition-colors">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+               </svg>
+            </button>
+         </div>
+
+         <!-- Copy Link Section -->
+         <div class="mb-6">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Movie Link</label>
+            <div class="flex bg-[#252b36] rounded-lg border border-white/10 overflow-hidden">
+               <input type="text" [value]="getCurrentUrl()" readonly class="bg-transparent text-gray-300 text-sm px-4 py-3 w-full outline-none">
+               <button (click)="copyToClipboard()" class="bg-[#00a8c5] hover:bg-[#0097b2] text-white px-4 font-bold text-sm transition-colors">
+                  Copy
+               </button>
+            </div>
+         </div>
+
+         <!-- Message Input Section -->
+         <div class="mb-6">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Add a Message</label>
+            <textarea 
+              [(ngModel)]="recommendationMessage" 
+              placeholder="Hey! You have to watch this..." 
+              class="w-full bg-[#252b36] text-white text-sm rounded-lg p-3 border border-white/10 focus:border-[#00a8c5] outline-none resize-none h-24 placeholder-gray-500"
+            ></textarea>
+         </div>
+
+         <!-- Quick Send Section - Uses Following List -->
+         <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">People You Follow</label>
+            @if (following().length > 0) {
+              <div class="space-y-2 max-h-60 overflow-y-auto">
+                 @for (friend of following(); track friend.username) {
+                    <div class="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
+                       <div class="flex items-center gap-3">
+                          <img [src]="friend.avatar" [alt]="friend.username" class="w-10 h-10 rounded-full">
+                          <div>
+                             <p class="text-white font-medium text-sm">{{friend.displayName}}</p>
+                             <p class="text-xs text-gray-500">&#64;{{friend.username}}</p>
+                          </div>
+                       </div>
+                       <button (click)="sendRecommendationTo(friend)" 
+                               [disabled]="isSubmittingRecommendation()"
+                               class="text-[#00a8c5] opacity-0 group-hover:opacity-100 transition-opacity font-bold text-xs uppercase border border-[#00a8c5] px-3 py-1 rounded-full hover:bg-[#00a8c5] hover:text-white disabled:opacity-50">
+                          @if (isSubmittingRecommendation()) {
+                            Sending...
+                          } @else {
+                            Send
+                          }
+                       </button>
+                    </div>
+                 }
+              </div>
+            } @else {
+              <div class="text-center py-6 bg-[#252b36]/50 rounded-xl">
+                <p class="text-gray-400 text-sm">You're not following anyone yet</p>
+                <a routerLink="/browse" class="text-[#00a8c5] text-sm hover:underline mt-2 inline-block">Discover users to follow</a>
+              </div>
+            }
+         </div>
+         
+         <div class="mt-6 pt-4 border-t border-white/5 text-center">
+            <button (click)="closeRecommendModal()" class="text-gray-400 text-sm hover:text-white">Maybe later</button>
+         </div>
+      </div>
+   </div>
+}

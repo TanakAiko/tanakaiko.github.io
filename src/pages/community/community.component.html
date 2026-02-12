@@ -1,0 +1,192 @@
+<div class="min-h-full p-8 pt-24 max-w-4xl mx-auto">
+
+  <!-- Page Header -->
+  <div class="mb-10">
+    <h1 class="text-3xl font-bold text-white mb-2">Community</h1>
+    <p class="text-gray-500">Discover people, follow friends, and grow your network.</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="relative mb-8">
+    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+      </svg>
+    </div>
+    <input
+      type="text"
+      [ngModel]="searchQuery()"
+      (ngModelChange)="onSearchInput($event)"
+      placeholder="Search users by name or username..."
+      class="w-full bg-[#252b36] text-white rounded-2xl pl-12 pr-5 py-4 outline-none focus:ring-2 focus:ring-[#00a8c5] transition-all placeholder-gray-500 border border-white/5 focus:border-[#00a8c5]"
+    >
+    @if (searchQuery()) {
+      <button
+        (click)="onSearchInput('')"
+        class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    }
+  </div>
+
+  <!-- Tabs (only visible when logged in) -->
+  @if (authService.isLoggedIn()) {
+    <div class="flex items-center gap-6 mb-8 border-b border-white/10 pb-1">
+      <button
+        (click)="switchTab('search')"
+        class="pb-3 px-1 font-semibold text-sm transition-colors relative"
+        [class.text-[#00a8c5]]="activeTab() === 'search'"
+        [class.text-gray-500]="activeTab() !== 'search'"
+        [class.hover:text-white]="activeTab() !== 'search'"
+      >
+        Search
+        @if (activeTab() === 'search') {
+          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-[#00a8c5]"></div>
+        }
+      </button>
+      <button
+        (click)="switchTab('followers')"
+        class="pb-3 px-1 font-semibold text-sm transition-colors relative"
+        [class.text-[#00a8c5]]="activeTab() === 'followers'"
+        [class.text-gray-500]="activeTab() !== 'followers'"
+        [class.hover:text-white]="activeTab() !== 'followers'"
+      >
+        My Followers
+        @if (activeTab() === 'followers') {
+          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-[#00a8c5]"></div>
+        }
+      </button>
+      <button
+        (click)="switchTab('following')"
+        class="pb-3 px-1 font-semibold text-sm transition-colors relative"
+        [class.text-[#00a8c5]]="activeTab() === 'following'"
+        [class.text-gray-500]="activeTab() !== 'following'"
+        [class.hover:text-white]="activeTab() !== 'following'"
+      >
+        Following
+        @if (activeTab() === 'following') {
+          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-[#00a8c5]"></div>
+        }
+      </button>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-20">
+      <div class="w-12 h-12 border-4 border-[#00a8c5] border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-400 text-sm">Searching...</p>
+    </div>
+  } @else {
+    <!-- Results -->
+    @if (displayedUsers().length > 0) {
+      <div class="space-y-3 animate-fade-in">
+        @for (user of displayedUsers(); track user.username) {
+          <div class="bg-[#252b36] hover:bg-[#2c3341] rounded-2xl p-5 flex items-center gap-5 border border-white/5 hover:border-[#00a8c5]/20 transition-all animate-slide-in">
+
+            <!-- Avatar -->
+            <div class="flex-shrink-0">
+              <div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#00a8c5] to-cyan-700 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-[#00a8c5]/10">
+                {{ user.username.charAt(0).toUpperCase() }}
+              </div>
+            </div>
+
+            <!-- User Info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <h3 class="text-white font-semibold truncate">{{ user.displayName }}</h3>
+                @if (isSelf(user.username)) {
+                  <span class="text-[10px] uppercase tracking-wider font-bold text-[#00a8c5] bg-[#00a8c5]/10 px-2 py-0.5 rounded-full">You</span>
+                }
+              </div>
+              <p class="text-gray-500 text-sm truncate">&#64;{{ user.username }}</p>
+              <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                  </svg>
+                  {{ user.followersCount }} {{ user.followersCount === 1 ? 'follower' : 'followers' }}
+                </span>
+                <span class="text-gray-700">•</span>
+                <span>{{ user.followingCount }} following</span>
+              </div>
+            </div>
+
+            <!-- Follow / Unfollow Button -->
+            @if (authService.isLoggedIn() && !isSelf(user.username)) {
+              <div class="flex-shrink-0">
+                <button
+                  (click)="toggleFollow(user)"
+                  [disabled]="isFollowLoading(user.username)"
+                  class="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  [class]="isFollowing(user.username)
+                    ? 'bg-white/5 border border-white/10 text-gray-300 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400'
+                    : 'bg-[#00a8c5] text-white hover:bg-[#0097b2] shadow-lg shadow-[#00a8c5]/20'"
+                >
+                  @if (isFollowLoading(user.username)) {
+                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  } @else if (isFollowing(user.username)) {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                    </svg>
+                    Unfollow
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                    </svg>
+                    Follow
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Empty States -->
+      <div class="text-center py-20 bg-white/5 rounded-2xl animate-fade-in">
+        @if (activeTab() === 'search') {
+          @if (searchQuery()) {
+            <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-8 h-8 text-gray-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 16.318A4.486 4.486 0 0012.016 15a4.486 4.486 0 00-3.198 1.318M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
+              </svg>
+            </div>
+            <p class="text-gray-400 text-lg">No users found for "{{ searchQuery() }}"</p>
+            <p class="text-gray-500 mt-2 text-sm">Try a different name or username</p>
+          } @else {
+            <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-8 h-8 text-gray-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </div>
+            <p class="text-gray-400 text-lg">Search for users</p>
+            <p class="text-gray-500 mt-2 text-sm">Type a name or username above to find people</p>
+          }
+        } @else if (activeTab() === 'followers') {
+          <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-8 h-8 text-gray-500">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+            </svg>
+          </div>
+          <p class="text-gray-400 text-lg">No followers yet</p>
+          <p class="text-gray-500 mt-2 text-sm">When people follow you, they'll appear here</p>
+        } @else {
+          <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-8 h-8 text-gray-500">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+            </svg>
+          </div>
+          <p class="text-gray-400 text-lg">Not following anyone yet</p>
+          <p class="text-gray-500 mt-2 text-sm">Search for users above and follow them to see their updates</p>
+        }
+      </div>
+    }
+  }
+</div>

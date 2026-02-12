@@ -1,112 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="Images/𝑨𝒏𝒊𝒎𝒆_𝑰𝒄𝒐𝒏𝒔-Manga_Profile_Pics_(extras).png" type="image/x-icon">
-<!-- font-family : Philosopher & Young Serif -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Philosopher&family=Young+Serif&display=swap" rel="stylesheet">
-</head> 
+  <meta charset="utf-8">
+  <title>Movie Explorer</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #1a1f26; /* New Dark Palette Background */
+      color: #eeeeee;
+    }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .glass-panel {
+      background: rgba(58, 63, 75, 0.4); /* Based on #3a3f4b */
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "rxjs": "https://esm.sh/rxjs@^7.8.2?conditions=es2015",
+    "rxjs/operators": "https://esm.sh/rxjs@^7.8.2/operators?conditions=es2015",
+    "rxjs/ajax": "https://esm.sh/rxjs@^7.8.2/ajax?conditions=es2015",
+    "rxjs/webSocket": "https://esm.sh/rxjs@^7.8.2/webSocket?conditions=es2015",
+    "rxjs/testing": "https://esm.sh/rxjs@^7.8.2/testing?conditions=es2015",
+    "rxjs/fetch": "https://esm.sh/rxjs@^7.8.2/fetch?conditions=es2015",
+    "@angular/compiler": "https://esm.sh/@angular/compiler@^21.1.3?external=rxjs",
+    "@angular/platform-browser": "https://esm.sh/@angular/platform-browser@^21.1.3?external=rxjs",
+    "@angular/core": "https://esm.sh/@angular/core@^21.1.3?external=rxjs",
+    "@angular/router": "https://esm.sh/@angular/router@^21.1.3?external=rxjs",
+    "@angular/common": "https://esm.sh/@angular/common@^21.1.3?external=rxjs",
+    "@angular/forms": "https://esm.sh/@angular/forms@^21.1.3?external=rxjs",
+    "@angular/core/rxjs-interop": "https://esm.sh/@angular/core@^21.1.3/rxjs-interop?external=rxjs"
+  }
+}
+</script>
+</head>
 <body>
-    <div class="Entete">
-        <h1>Top Mangas !</h1>
-        <a href="second/index.html"></a>
-        <p id="firstP" style="text-align: center;">Ce top est une liste personnel et subjectif de mes mangas favorits.</p>
-    </div>
-    <ol>
-        <li><a href="https://www.nautiljon.com/mangas/gto+-+great+teacher+onizuka.html" target="_blank">GTO - Great Teacher Onizuka</a></li>
-            <img src="Images/Great Teacher Onizuka (GTO) Fujisawa Tohru.jpeg" alt="Eikichi Onizuka" title="Eikichi Onizuka">
-            <p>Ancien voyou, chef de gang, Eikichi Onizuka décide un jour de devenir prof.
-                Sa vocation n'a rien de pédagogique. Ce qu'il veut,
-                c'est pouvoir sortir avec les étudiantes du lycée où il travaille.
-                Pourtant, au fil des chapitres, on se rend compte que le sens de la justice
-                et de l'honneur de notre héros vont l'amener à devenir un véritable enseignant.
-                <br><br>
-                Cette série de <a href="https://www.nautiljon.com/people/fujisawa+toru.html">Tôru Fujisawa</a>  a connu un tel succès au Japon qu'elle fut adaptée en
-                feuilleton " live " à la télé et au cinéma. Drôle et " vrai ",
-                plein de rebondissements et doté d'une psychologie rare dans ce domaine,
-                GTO met en scène des adolescents en quête d'identité comme il en existe partout.
-            </p>
-        <li><a href="https://www.nautiljon.com/mangas/berserk.html" target="_blank">Berserk</a></li>
-            <img src="Images/berserk manga icon.jpeg" alt="Berserk manga" title="Guts">
-            <p>
-                Dans un monde médiéval et marqué par un passé difficile,
-                erre un mercenaire solitaire nommé Guts, décidé à être seul maître de son destin.
-                Autrefois contraint par un pari perdu à rejoindre les Faucons,
-                une troupe de mercenaires dirigés par Griffith, Guts fut acteur de nombreux combats
-                sanglants et témoin de sombres intrigues politiques. Mais il réalisa soudain que
-                la fatalité n'existe pas et qu'il pouvait reprendre sa liberté s'il le désirait vraiment...
-                <br>
-                Mais un mal le traque sans relâche.
-            </p>
-        <li><a href="https://www.nautiljon.com/mangas/sun-ken+rock.html" target="_blank">Sun-Ken Rock</a></li>
-            <img src="Images/Ken Kitano Icon ( SKR ).jpeg" alt="Sun-Ken Rock" title="Kitano Ken">
-            <p>
-                Kitano Ken, un jeune Japonais, est un looser et passe son temps à se lamenter sur son sort.
-                Un jour il décide de prendre son destin en main : il part à Séoul.
-                Il veut retrouver Yumin, une fille qu'il aime. Elle travaille dans la police.
-                Afin de l'impressionner, Ken veut devenir agent de police...
-                Mais le chemin est semé d'embûche.
-                <br><br>
-                Ken va malencontreusement faire la connaissance d'un gang de mafieux...
-                Pour lui, une nouvelle vie commence !
-            </p>
-        <li><a href="https://www.nautiljon.com/mangas/bonne+nuit+punpun.html" target="_blank">Oyasumi Punpun</a></li>
-            <img src="Images/Punpun.jpeg" alt="Oyasumi Punpun" title="Punpun">
-            <p>
-                Punpun est un enfant banal qui mène une vie des plus banale.
-                Mais un jour arrive et sa vie ainsi que celle de sa famille proche
-                bascule soudainement. À la suite d'une virulente dispute conjugale,
-                le père de Punpun bat sa mère au point de l'envoyer à l'hôpital.
-                <br><br>
-                En parallèle, le jeune homme fait la rencontre de Aiko,
-                nouvelle élève de sa classe, qui semble déjà l'intéresser tout particulièrement...
-                <br><br>
-                Véritable ode à la vie de tous les jours d'un adolescent et de sa
-                bande de "potes", "Bonne nuit Punpun", dernière œuvre en date de
-                <a href="https://www.nautiljon.com/people/asano+inio.html">Inio Asano</a> (Solanin, Le Quartier de Lumière...),
-                oscille entre le drame et le comique et raconte les péripéties à la fois particulières et bénignes,
-                d'un jeune homme en quête d'espoir.
-            </p>
-        <li><a href="https://www.nautiljon.com/mangas/vagabond.html" target="_blank">Vagabond</a></li>
-            <img src="Images/takezo.jpeg" alt="vagabond" title="Shinmen Takezô">
-            <p>
-                En 1600 a lieu la terrible bataille de Sekigahara,
-                qui assied le pouvoir du shôgun Tokugawa. Parmi les combattants
-                se trouve Musashi, le fils d'un grand samurai, qui est prêt à tout
-                pour survivre.
-                <br><br>
-                Alors qu'il revient dans son village natal,
-                il est pourchassé pour avoir déserté, et se trouve rejeté par les habitants.
-                Commence alors pour lui une longue errance, avec un
-                unique objectif : améliorer sa maitrise de la lame, et devenir le meilleur samurai du Japon.
-            </p>
-        <li><a href="https://www.nautiljon.com/mangas/slam+dunk.html" target="_blank">Slam Dunk</a></li>
-            <img src="Images/sakuragi.jpeg" alt="Slam Dunk" title="Hanamichi Sakuragi">
-            <p>
-                Hanamichi Sakuragi, terrible voyou immature et impopulaire,
-                est bien décidé à en finir avec les déceptions amoureuses lors de son entrée au lycée à Shohoku.
-                Il y rencontre alors Haruko Akagi, une fille dont il tombe amoureux.
-                Suivant ses conseils et pour lui faire plaisir, il décide de jouer au basket-ball
-                et d'intégrer le club du lycée. Cependant lors d'une altercation avec le capitaine
-                de l'équipe de basket-ball du lycée, Hanamichi se voit contraint de le défier en duel
-                lors d'un face à face. Sakuragi finit par gagner et apprend que le capitaine n'est autre
-                que le frère aîné d'Haruko : Takenori Akagi, alias le Gorille.
-                Malgré certaines réticences, ce dernier le laisse finalement entrer dans l'équipe de
-                basket, malheureusement pour lui, le garçon dont est amoureux Haruko, l'idole de toute
-                les filles et le joueur de première année le plus talentueux du département,
-                Kaede Rukawa, y est aussi.
-                <br><br>
-                Les deux garçons rivaux vont devoir ainsi jouer dans la même équipe.
-                Sakuragi se met alors à réellement aimer le basket et à travers de nombreuses
-                péripéties Rukawa, Akagi et Sakuragi se lancent alors à la conquête dutitre national.
-            </p>
-    </ol>
-    <form action="/ascii-art" method="post">
-        <button>Envoyer</button>
-    </form>
+  <app-root></app-root>
 </body>
 </html>

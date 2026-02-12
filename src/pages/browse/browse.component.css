@@ -1,0 +1,31 @@
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Custom styling for the range slider thumbs to make them interactable even when input is technically invisible/pointer-events-none */
+.range-thumb-auto::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: grab;
+}
+
+.range-thumb-auto::-moz-range-thumb {
+  pointer-events: auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: grab;
+  border: none;
+}
+
+.range-thumb-auto:active::-webkit-slider-thumb {
+  cursor: grabbing;
+}

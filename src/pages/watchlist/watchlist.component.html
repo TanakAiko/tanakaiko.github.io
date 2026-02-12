@@ -1,0 +1,70 @@
+<div class="min-h-full p-8 pt-24">
+   <!-- Header -->
+   <div class="mb-8 flex items-end justify-between border-b border-white/10 pb-6">
+      <div>
+        <h1 class="text-4xl font-bold text-white mb-2">My Watchlist</h1>
+        <p class="text-gray-400">Movies you want to watch later</p>
+      </div>
+      <div class="text-[#00a8c5] font-bold text-lg">
+        {{ watchlist().length }} Movies
+      </div>
+   </div>
+
+   @if (!authService.isLoggedIn()) {
+      <div class="flex flex-col items-center justify-center py-20 opacity-50">
+         <div class="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6">
+           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-10 h-10 text-gray-400">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
+         </div>
+         <p class="text-xl text-gray-300 font-medium">Sign in to see your watchlist</p>
+         <p class="text-gray-500 mt-2">Your watchlist will be saved across devices.</p>
+         <a routerLink="/auth" class="mt-6 px-6 py-3 bg-[#00a8c5] text-white rounded-lg font-bold hover:bg-[#0097b2] transition-colors">
+           Sign In
+         </a>
+      </div>
+   } @else if (isLoading()) {
+      <div class="flex flex-col items-center justify-center py-20">
+         <div class="w-16 h-16 border-4 border-[#00a8c5] border-t-transparent rounded-full animate-spin mb-4"></div>
+         <p class="text-gray-400">Loading your watchlist...</p>
+      </div>
+   } @else if (watchlist().length === 0) {
+      <div class="flex flex-col items-center justify-center py-20 opacity-50">
+         <div class="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6">
+           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-10 h-10 text-gray-400">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+         </div>
+         <p class="text-xl text-gray-300 font-medium">Your watchlist is empty</p>
+         <p class="text-gray-500 mt-2">Browse movies and click the "+" button to add them here.</p>
+         <a routerLink="/browse" class="mt-6 px-6 py-3 bg-[#00a8c5] text-white rounded-lg font-bold hover:bg-[#0097b2] transition-colors">
+           Explore Movies
+         </a>
+      </div>
+   } @else {
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        @for (movie of watchlist(); track movie.tmdbId) {
+           <div class="group relative block aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-white/5 bg-[#252b36]">
+              
+              <a [routerLink]="['/movie', movie.tmdbId]" class="cursor-pointer">
+                <img [src]="movie.poster" class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110 group-hover:opacity-60" alt="{{movie.title}}">
+              </a>
+              
+              <!-- Remove Button (Top Right) -->
+              <button (click)="removeFromWatchlist(movie.tmdbId)" class="absolute top-2 right-2 bg-black/60 hover:bg-red-500/80 backdrop-blur rounded-full p-2 text-white transition-colors z-20 group-hover:opacity-100 opacity-0" title="Remove from Watchlist">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <!-- Info Overlay -->
+              <a [routerLink]="['/movie', movie.tmdbId]" class="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                 <h3 class="text-white font-bold leading-tight mb-1">{{movie.title}}</h3>
+                 <p class="text-[#00a8c5] text-xs font-bold">{{movie.year}}</p>
+              </a>
+
+           </div>
+        }
+      </div>
+   }
+</div>

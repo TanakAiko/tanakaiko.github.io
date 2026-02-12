@@ -1,0 +1,21 @@
+<div class="min-h-screen bg-[#1a1f26] text-[#eeeeee] font-sans selection:bg-[#00a8c5] selection:text-white overflow-hidden">
+  
+  <!-- Toast Notifications -->
+  <app-toast></app-toast>
+
+  @if (!isLoginPage()) {
+    <div class="flex h-screen">
+      <!-- Sidebar: Always visible on non-auth pages -->
+      <app-sidebar class="w-24 flex-shrink-0 z-50 transition-all duration-300"></app-sidebar>
+      
+      <!-- Main Content Area -->
+      <div class="flex-1 overflow-y-auto overflow-x-hidden relative scroll-smooth no-scrollbar">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  } @else {
+    <!-- Full screen login page -->
+    <router-outlet></router-outlet>
+  }
+
+</div>
