@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://localhost:8085",
+    "target": "https://elanor-nonprofessed-venus.ngrok-free.dev",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug",
