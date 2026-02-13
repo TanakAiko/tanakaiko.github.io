@@ -80,6 +80,9 @@ export class MovieDetailComponent implements OnInit {
     return this.watchlistService.watchlistIds().has(tmdbId);
   });
 
+  // All reviews/ratings for this movie from all users
+  readonly movieReviews = this.ratingService.movieReviews;
+
   // -------------------------------------------------------------------------
   // Lifecycle Hooks
   // -------------------------------------------------------------------------
@@ -91,7 +94,11 @@ export class MovieDetailComponent implements OnInit {
         return id ? parseInt(id, 10) : null;
       }),
       filter((id): id is number => id !== null),
-      switchMap(tmdbId => this.movieService.getMovieWithSimilar(tmdbId))
+      switchMap(tmdbId => {
+        // Load reviews for this movie (public, no auth needed)
+        this.ratingService.getMovieReviews(tmdbId).subscribe();
+        return this.movieService.getMovieWithSimilar(tmdbId);
+      })
     ).subscribe();
 
     // Load following list for recommendations if logged in
@@ -169,6 +176,8 @@ export class MovieDetailComponent implements OnInit {
       next: () => {
         // NotificationService is handled in RatingService, but we can add UI hints here if needed
         this.isSubmittingReview.set(false);
+        // Refresh reviews to show the new rating
+        this.ratingService.getMovieReviews(tmdbId).subscribe();
       },
       error: () => {
         this.isSubmittingReview.set(false);
@@ -254,5 +263,24 @@ export class MovieDetailComponent implements OnInit {
     navigator.clipboard.writeText(this.getCurrentUrl()).then(() => {
       this.notificationService.success('Link copied to clipboard');
     });
+  }
+  
+  /** Generate an array of star types for a given score */
+  getStars(score: number): ('full' | 'empty')[] {
+    return Array.from({ length: 5 }, (_, i) => i < score ? 'full' : 'empty');
+  }
+
+  /** Format a date string to a relative or readable format */
+  formatReviewDate(dateStr: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 30) return `${diffDays} days ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return `${Math.floor(diffDays / 365)} years ago`;
   }
 }

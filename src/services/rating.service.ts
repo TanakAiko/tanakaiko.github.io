@@ -30,6 +30,16 @@ export interface UserRating {
   ratedDate: string;
 }
 
+/**
+ * A single review/rating on a movie from any user (public)
+ */
+export interface MovieReview {
+  username: string;
+  score: number;
+  comment?: string;
+  ratedDate: string;
+}
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -67,10 +77,14 @@ export class RatingService {
   /** Error state */
   private readonly _error = signal<string | null>(null);
 
+  /** Reviews for the currently viewed movie */
+  private readonly _movieReviews = signal<MovieReview[]>([]);
+
   // Public readonly signals
   readonly userRatings = this._userRatings.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly error = this._error.asReadonly();
+  readonly movieReviews = this._movieReviews.asReadonly();
 
   // Computed: Ratings count
   readonly count = computed(() => this._userRatings().length);
@@ -188,6 +202,19 @@ export class RatingService {
   getAverageRating(tmdbId: number): Observable<number | null> {
     return this.http.get<number>(`${this.apiUrl}/movie/${tmdbId}/average`).pipe(
       catchError(() => of(null))
+    );
+  }
+
+  /**
+   * Get all reviews/ratings for a movie from all users (public, no auth required)
+   */
+  getMovieReviews(tmdbId: number): Observable<MovieReview[]> {
+    return this.http.get<MovieReview[]>(`${this.apiUrl}/movie/${tmdbId}/reviews`).pipe(
+      tap((reviews) => this._movieReviews.set(reviews)),
+      catchError((error) => {
+        console.error('Fetch movie reviews error:', error);
+        return of([]);
+      })
     );
   }
 

@@ -36,6 +36,7 @@ const PUBLIC_PATTERNS = [
   /^\/api\/movies\/\d+$/, // /api/movies/{tmdbId}
   /^\/api\/movies\/\d+\/similar$/, // /api/movies/{tmdbId}/similar
   /^\/api\/ratings\/movie\/\d+\/average$/, // /api/ratings/movie/{tmdbId}/average
+  /^\/api\/ratings\/movie\/\d+\/reviews$/, // /api/ratings/movie/{tmdbId}/reviews
 ] as const;
 
 // ============================================================================

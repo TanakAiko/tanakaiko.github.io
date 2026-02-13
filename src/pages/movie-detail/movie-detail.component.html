@@ -211,7 +211,7 @@
            </div>
         </section>
 
-        <!-- Movie Info Section (replacing reviews since backend doesn't have reviews per movie) -->
+        <!-- Movie Info Section -->
         <section>
           <div class="flex items-center justify-between mb-6 border-b border-white/5 pb-2">
              <h2 class="text-xl font-bold uppercase tracking-wider text-gray-400">Movie Info</h2>
@@ -242,6 +242,64 @@
               </div>
             </div>
           </div>
+        </section>
+
+        <!-- User Reviews Section -->
+        <section>
+          <div class="flex items-center justify-between mb-6 border-b border-white/5 pb-2">
+            <h2 class="text-xl font-bold uppercase tracking-wider text-gray-400">User Reviews</h2>
+            @if (movieReviews().length > 0) {
+              <span class="text-sm text-gray-500">{{ movieReviews().length }} {{ movieReviews().length === 1 ? 'review' : 'reviews' }}</span>
+            }
+          </div>
+
+          @if (movieReviews().length > 0) {
+            <div class="space-y-4">
+              @for (review of movieReviews(); track review.username + review.ratedDate) {
+                <div class="bg-[#252b36] rounded-2xl p-5 border border-white/5 hover:border-white/10 transition-colors">
+                  <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                      <!-- Avatar -->
+                      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#00a8c5] to-cyan-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                        {{ review.username.charAt(0).toUpperCase() }}
+                      </div>
+                      <div>
+                        <p class="text-white font-semibold text-sm">{{ review.username }}</p>
+                        <p class="text-gray-500 text-xs">{{ formatReviewDate(review.ratedDate) }}</p>
+                      </div>
+                    </div>
+                    <!-- Star Rating -->
+                    <div class="flex items-center gap-0.5">
+                      @for (star of getStars(review.score); track $index) {
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
+                             [attr.fill]="star === 'full' ? 'currentColor' : 'none'"
+                             stroke="currentColor" stroke-width="2"
+                             [class.text-[#00a8c5]]="star === 'full'"
+                             [class.text-gray-600]="star === 'empty'"
+                             class="w-4 h-4">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.563.04.8.77.388 1.192l-4.204 4.312a.563.563 0 00-.154.488l1.284 5.757a.562.562 0 01-.84.613l-4.726-2.853a.563.563 0 00-.586 0l-4.726 2.853a.562.562 0 01-.84-.613l1.285-5.757a.563.563 0 00-.154-.488l-4.204-4.312a.563.563 0 01.388-1.192l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                        </svg>
+                      }
+                      <span class="text-gray-400 text-xs ml-1.5 font-medium">{{ review.score }}/5</span>
+                    </div>
+                  </div>
+                  @if (review.comment) {
+                    <div class="bg-black/20 p-4 rounded-xl border-l-2 border-[#00a8c5]/50">
+                      <p class="text-gray-300 text-sm leading-relaxed italic">"{{ review.comment }}"</p>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="text-center py-10 bg-[#252b36]/50 rounded-2xl border border-white/5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-12 h-12 text-gray-600 mx-auto mb-3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+              </svg>
+              <p class="text-gray-400 font-medium">No reviews yet</p>
+              <p class="text-gray-500 text-sm mt-1">Be the first to rate this movie!</p>
+            </div>
+          }
         </section>
       </div>
 
