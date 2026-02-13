@@ -8,6 +8,7 @@ import { RatingService } from '../../services/rating.service';
 import { RecommendationService } from '../../services/recommendation.service';
 import { UserService, UserDisplay } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, switchMap, filter } from 'rxjs/operators';
 
@@ -29,6 +30,7 @@ export class MovieDetailComponent implements OnInit {
   readonly movieService = inject(MovieService);
   readonly authService = inject(AuthService);
   readonly watchlistService = inject(WatchlistService);
+  private readonly notificationService = inject(NotificationService);
   private readonly ratingService = inject(RatingService);
   private readonly recommendationService = inject(RecommendationService);
   private readonly userService = inject(UserService);
@@ -126,25 +128,46 @@ export class MovieDetailComponent implements OnInit {
     return this.movieService.getPosterUrl(movie.posterPath);
   }
 
-  setRating(star: number): void {
-    this.currentRating.set(star);
+  // -------------------------------------------------------------------------
+  // Rating & Watchlist
+  // -------------------------------------------------------------------------
+  
+  /**
+   * Submit or update movie rating
+   */
+  setRating(score: number): void {
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.error('Please login to rate movies');
+      return;
+    }
+    this.currentRating.set(score);
   }
 
+  /**
+   * Submit comment along with rating
+   */
   submitReview(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.error('Please login to review');
+      return;
+    }
+  
     const tmdbId = this.tmdbIdParam();
-    if (!tmdbId || this.currentRating() === 0) return;
+    if (!tmdbId) return;
+
+    // Must have a rating to leave a comment usually, or at least it updates the rating
+    const score = this.currentRating() || this.userRating() || 0;
+    
+    if (score === 0) {
+       this.notificationService.error('Please select a rating score first');
+       return;
+    }
 
     this.isSubmittingReview.set(true);
-    
-    this.ratingService.rateMovie(
-      tmdbId, 
-      this.currentRating(), 
-      this.reviewComment() || undefined
-    ).subscribe({
+
+    this.ratingService.rateMovie(tmdbId, score, this.reviewComment()).subscribe({
       next: () => {
-        // Reset form
-        this.currentRating.set(0);
-        this.reviewComment.set('');
+        // NotificationService is handled in RatingService, but we can add UI hints here if needed
         this.isSubmittingReview.set(false);
       },
       error: () => {
@@ -153,14 +176,51 @@ export class MovieDetailComponent implements OnInit {
     });
   }
 
-  openRecommendModal(): void {
+  /**
+   * Toggle watchlist status
+   */
+  toggleWatchlist(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.error('Please login to manage watchlist');
+      return;
+    }
+
+    const tmdbId = this.tmdbIdParam();
+    if (!tmdbId) return;
+
+    if (this.inWatchlist()) {
+      this.watchlistService.removeFromWatchlist(tmdbId).subscribe({
+        next: () => this.notificationService.success('Removed from watchlist'),
+        error: () => this.notificationService.error('Failed to remove from watchlist')
+      });
+    } else {
+      this.watchlistService.addToWatchlist(tmdbId).subscribe({
+        next: () => this.notificationService.success('Added to watchlist'),
+        error: () => this.notificationService.error('Failed to add to watchlist')
+      });
+    }
+  }
+
+  /**
+   * Open recommendation modal
+   */
+  openRecommendationModal(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.error('Please login to recommend movies');
+      return;
+    }
     this.recommendationMessage.set('');
     this.selectedFriend.set(null);
     this.showRecommendModal.set(true);
   }
 
+  /**
+   * Close recommendation modal
+   */
   closeRecommendModal(): void {
     this.showRecommendModal.set(false);
+    this.selectedFriend.set(null);
+    this.recommendationMessage.set('');
   }
 
   sendRecommendationTo(friend: UserDisplay): void {
@@ -175,10 +235,12 @@ export class MovieDetailComponent implements OnInit {
       this.recommendationMessage() || undefined
     ).subscribe({
       next: () => {
+        this.notificationService.success(`Recommended to ${friend.displayName}`);
         this.isSubmittingRecommendation.set(false);
         this.closeRecommendModal();
       },
       error: () => {
+        this.notificationService.error('Failed to send recommendation');
         this.isSubmittingRecommendation.set(false);
       }
     });
@@ -190,13 +252,7 @@ export class MovieDetailComponent implements OnInit {
 
   copyToClipboard(): void {
     navigator.clipboard.writeText(this.getCurrentUrl()).then(() => {
-      // Could add a toast notification here
+      this.notificationService.success('Link copied to clipboard');
     });
-  }
-
-  toggleWatchlist(): void {
-    const tmdbId = this.tmdbIdParam();
-    if (!tmdbId) return;
-    this.watchlistService.toggleWatchlist(tmdbId).subscribe();
   }
 }

@@ -99,22 +99,22 @@
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-[#00a8c5]">
                          <path fill-rule="evenodd" d="M6.32 2.577a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 01-1.085.67L12 18.089l-7.165 3.583A.75.75 0 013.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93z" clip-rule="evenodd" />
                       </svg>
-                      Added to Watchlist
+                      In Watchlist
                    } @else {
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                       </svg>
-                      Add to Watchlist
+                      Watchlist
                    }
                 </button>
 
-                <!-- Recommend Button -->
-                <button (click)="openRecommendModal()" 
-                        class="bg-[#00a8c5] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#0097b2] transition-all flex items-center gap-2 shadow-lg shadow-[#00a8c5]/20">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
-                  </svg>
-                  Recommend to Friend
+                <!-- Recommendation Button -->
+                <button (click)="openRecommendationModal()" 
+                        class="bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold py-3 px-6 rounded-lg hover:bg-white/20 transition-all flex items-center gap-2">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                   </svg>
+                   Recommend
                 </button>
               }
            </div>
@@ -144,7 +144,8 @@
             <!-- Comment Input -->
             <div class="mb-4">
               <textarea 
-                [(ngModel)]="reviewComment" 
+                [ngModel]="reviewComment()"
+                (ngModelChange)="reviewComment.set($event)"
                 placeholder="Share your thoughts about this movie..." 
                 rows="3"
                 class="w-full bg-black/20 text-white text-sm rounded-lg p-3 border border-white/10 focus:border-[#00a8c5] outline-none resize-none transition-colors placeholder-gray-500"
