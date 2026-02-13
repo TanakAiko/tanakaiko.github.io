@@ -12,6 +12,7 @@ import { WatchlistComponent } from './src/pages/watchlist/watchlist.component';
 import { ProfileComponent } from './src/pages/profile/profile.component';
 import { CommunityComponent } from './src/pages/community/community.component';
 import { authInterceptor } from './src/services/auth.interceptor';
+import { authGuard } from './src/core/auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -20,10 +21,10 @@ const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'browse', component: BrowseComponent },
   { path: 'movie/:tmdbId', component: MovieDetailComponent },
-  { path: 'recommendations', component: RecommendationsComponent },
-  { path: 'watchlist', component: WatchlistComponent },
-  { path: 'profile', component: ProfileComponent },
-  { path: 'community', component: CommunityComponent },
+  { path: 'recommendations', component: RecommendationsComponent, canActivate: [authGuard] },
+  { path: 'watchlist', component: WatchlistComponent, canActivate: [authGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+  { path: 'community', component: CommunityComponent, canActivate: [authGuard] },
 ];
 
 bootstrapApplication(AppComponent, {
