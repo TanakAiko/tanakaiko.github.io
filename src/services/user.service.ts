@@ -55,6 +55,9 @@ export class UserService {
   
   /** Search results */
   private readonly _searchResults = signal<UserDisplay[]>([]);
+
+  /** All registered users (community list) */
+  private readonly _allUsers = signal<UserDisplay[]>([]);
   
   /** Loading state */
   private readonly _isLoading = signal<boolean>(false);
@@ -67,6 +70,7 @@ export class UserService {
   readonly followers = this._followers.asReadonly();
   readonly following = this._following.asReadonly();
   readonly searchResults = this._searchResults.asReadonly();
+  readonly allUsers = this._allUsers.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly error = this._error.asReadonly();
 
@@ -113,6 +117,27 @@ export class UserService {
       catchError((error) => {
         this._error.set('Search failed');
         console.error('User search error:', error);
+        return of([]);
+      }),
+      finalize(() => this._isLoading.set(false))
+    );
+  }
+
+  /**
+   * List all registered users (for community discovery)
+   */
+  listAllUsers(limit: number = 50): Observable<UserDisplay[]> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    return this.http.get<PublicProfile[]>(`${this.apiUrl}/all`, {
+      params: { limit: limit.toString() }
+    }).pipe(
+      map(profiles => profiles.map(p => this.toUserDisplay(p))),
+      tap((profiles) => this._allUsers.set(profiles)),
+      catchError((error) => {
+        this._error.set('Failed to load users');
+        console.error('List all users error:', error);
         return of([]);
       }),
       finalize(() => this._isLoading.set(false))

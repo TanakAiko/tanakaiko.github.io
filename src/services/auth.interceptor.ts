@@ -1,5 +1,5 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, Injector } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 
@@ -13,6 +13,7 @@ const PUBLIC_ENDPOINTS = [
   '/api/users/register',
   '/api/users/refresh',
   '/api/users/search',
+  '/api/users/all',
   '/api/movies/trending',
   '/api/movies/popular',
   '/api/movies/random',
@@ -50,7 +51,10 @@ const PUBLIC_PATTERNS = [
  * - Retries failed requests after successful refresh
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
+  const injector = inject(Injector);
+  // Lazily resolve AuthService to break the circular dependency:
+  // HttpClient → Interceptor → AuthService → HttpClient
+  const authService = injector.get(AuthService);
 
   // Determine if this is a public endpoint
   const isPublicEndpoint = isPublic(req.url);
@@ -69,13 +73,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       }
     });
   }
-
-  // Inject ngrok bypass header into ALL requests
-  authReq = authReq.clone({
-    setHeaders: {
-      'ngrok-skip-browser-warning': 'true'
-    }
-  });
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {

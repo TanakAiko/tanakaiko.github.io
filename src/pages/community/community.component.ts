@@ -50,6 +50,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
   // Public Readonly Signals
   // -------------------------------------------------------------------------
   readonly searchResults = this.userService.searchResults;
+  readonly allUsers = this.userService.allUsers;
   readonly followers = this.userService.followers;
   readonly following = this.userService.following;
   readonly isLoading = this.userService.isLoading;
@@ -59,7 +60,10 @@ export class CommunityComponent implements OnInit, OnDestroy {
     switch (this.activeTab()) {
       case 'followers': return this.followers();
       case 'following': return this.following();
-      case 'search': return this.searchResults();
+      case 'search': 
+        // If there's an active search query, show search results;
+        // otherwise show all registered users
+        return this.searchQuery() ? this.searchResults() : this.allUsers();
     }
   });
 
@@ -69,11 +73,21 @@ export class CommunityComponent implements OnInit, OnDestroy {
   // Lifecycle
   // -------------------------------------------------------------------------
   ngOnInit(): void {
+    // Load all registered users for the community list
+    this.userService.listAllUsers().subscribe();
+
     // Set up debounced search
     this.searchSubscription = this.searchSubject.pipe(
       debounceTime(350),
       distinctUntilChanged(),
-      switchMap(query => this.userService.searchUsers(query))
+      switchMap(query => {
+        if (!query.trim()) {
+          // When search is cleared, refresh the all-users list
+          this.userService.clearSearchResults();
+          return this.userService.listAllUsers();
+        }
+        return this.userService.searchUsers(query);
+      })
     ).subscribe();
 
     // Load the current user's following list to know follow states
