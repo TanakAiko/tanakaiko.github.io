@@ -69,7 +69,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (token && !isPublicEndpoint) {
     authReq = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'ngrok-skip-browser-warning': 'true'
+      }
+    });
+  } else {
+    // Also add the header for public endpoints
+    authReq = req.clone({
+      setHeaders: {
+        'ngrok-skip-browser-warning': 'true'
       }
     });
   }
